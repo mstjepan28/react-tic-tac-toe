@@ -20,9 +20,6 @@ export const validateNewSize = (newSize?: number) => {
   return isOdd ? newValue : newValue + 1;
 };
 
-/**
- *
- */
 export const checkForWin = (
   curPlayer: TPlayer,
   board: TCellState[][],
@@ -47,4 +44,8 @@ export const checkForWin = (
   });
 
   return horizontalWin || verticalWin || diagonalWin;
+};
+
+export const checkForDraw = (board: TCellState[][]) => {
+  return board.flat().every((cell) => cell !== CellState.EMPTY);
 };

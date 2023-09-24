@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CellState, TCellState } from "../enums/CellState";
 import { Player, TPlayer } from "../enums/Player";
-import { checkForWin, validateNewSize } from "../utils/helpers";
+import { checkForDraw, checkForWin, validateNewSize } from "../utils/helpers";
 import { WinnerModal } from "./WinnerModal";
+import { DrawModal } from "./DrawModal";
 
 interface IProps {
   size?: number;
@@ -12,7 +13,8 @@ export const TicTacToe = ({ size }: IProps) => {
   const [curPlayer, setCurPlayer] = useState<TPlayer>(Player.PLAYER_X);
   const [board, setBoard] = useState<TCellState[][] | undefined>(undefined);
 
-  const modalRef = useRef() as any;
+  const winModalRef = useRef() as any;
+  const drawModalRef = useRef() as any;
 
   // ----------------------------------------- //
 
@@ -29,7 +31,10 @@ export const TicTacToe = ({ size }: IProps) => {
   // ----------------------------------------- //
 
   const openWinnerModal = () => {
-    modalRef.current.open(curPlayer);
+    winModalRef.current.open(curPlayer);
+  };
+  const openDrawModal = () => {
+    drawModalRef.current.open(curPlayer);
   };
 
   const renderCell = (
@@ -84,14 +89,18 @@ export const TicTacToe = ({ size }: IProps) => {
 
     setBoard(boardCopy);
 
+    const isDraw = checkForDraw(boardCopy);
     const winConditionMet = checkForWin(
       curPlayer,
       boardCopy,
       rowIndex,
       colIndex
     );
+
     if (winConditionMet) {
       openWinnerModal();
+    } else if (isDraw) {
+      openDrawModal();
     } else {
       togglePlayer();
     }
@@ -123,7 +132,9 @@ export const TicTacToe = ({ size }: IProps) => {
 
   return (
     <div>
-      <WinnerModal ref={modalRef} resetGame={setupBoard} />
+      <WinnerModal ref={winModalRef} resetGame={setupBoard} />
+      <DrawModal ref={drawModalRef} resetGame={setupBoard} />
+
       {renderedBoard}
     </div>
   );
